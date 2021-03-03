@@ -1,4 +1,4 @@
-from .MassVax import MassVax
+from scraper.sources.MassVax import MassVax
 
 
 def scrape():

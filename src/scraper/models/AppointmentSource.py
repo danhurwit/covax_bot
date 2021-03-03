@@ -1,9 +1,9 @@
 from typing import List
-from .Location import Location
+from scraper.models.Location import Location
 
 
 class AppointmentSource:
-    locations = []
+    locations: List[Location] = []
 
     def scrape_locations(self):
         pass

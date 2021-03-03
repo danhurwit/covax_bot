@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List
 
-from .AvailabilityWindow import AvailabilityWindow
+from scraper.models.AvailabilityWindow import AvailabilityWindow
 
 
 class Location:
