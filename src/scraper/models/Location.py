@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from functools import reduce
 from typing import List
 
 from scraper.models.AvailabilityWindow import AvailabilityWindow
@@ -27,6 +28,9 @@ class Location:
 
     def get_availability_windows(self) -> List[AvailabilityWindow]:
         return self.availability_windows
+
+    def has_availability(self) -> bool:
+        return reduce(lambda x, y: x + y,  map(lambda a: a.get_num_available(), self.availability_windows)) > 0
 
     def format_message(self) -> str:
         base = "Site Name: {}\nBooking Link: {}\nAvailability:\n".format(self.name, self.booking_link)
