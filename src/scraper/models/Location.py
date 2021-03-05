@@ -30,7 +30,9 @@ class Location:
         return self.availability_windows
 
     def has_availability(self) -> bool:
-        return reduce(lambda x, y: x + y,  map(lambda a: a.get_num_available(), self.availability_windows)) > 0
+        if self.availability_windows:
+            return reduce(lambda x, y: x + y,  map(lambda a: a.get_num_available(), self.availability_windows)) > 0
+        return False
 
     def format_message(self) -> str:
         base = "Site Name: {}\nBooking Link: {}\nAvailability:\n".format(self.name, self.booking_link)

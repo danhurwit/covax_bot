@@ -1,11 +1,10 @@
-import os
 from typing import List
+
+from decouple import config
+from discord import Webhook, RequestsWebhookAdapter
 
 from publisher.channel.Publisher import Publisher
 from scraper.models.Location import Location
-
-from discord import Webhook, RequestsWebhookAdapter
-from decouple import config
 
 
 class DiscordPublisher(Publisher):
