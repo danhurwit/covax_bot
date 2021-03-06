@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 /venv/
 /.idea/
-/src/validator/appointments.db
+/src/data/appointments.db

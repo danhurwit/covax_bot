@@ -1,7 +1,7 @@
 import itertools
 from typing import List
 
-from scraper.models.Location import Location
+from models.sources.Location import Location
 from scraper.sources.MassVax import MassVax
 
 sources = [MassVax]

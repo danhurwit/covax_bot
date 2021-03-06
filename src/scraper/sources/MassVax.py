@@ -5,9 +5,9 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 
-from scraper.models.AppointmentSource import AppointmentSource
-from scraper.models.AvailabilityWindow import AvailabilityWindow
-from scraper.models.Location import Location
+from models.sources.AppointmentSource import AppointmentSource
+from models.sources.AvailabilityWindow import AvailabilityWindow
+from models.sources.Location import Location
 
 URL = "https://vaxfinder.mass.gov/?zip_or_city=02139"
 BASE_URL = "https://vaxfinder.mass.gov"

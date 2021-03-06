@@ -3,9 +3,9 @@ import sqlite3
 from datetime import datetime
 from typing import List
 
-from validator.db_admin import DB_NAME
+from data.db_admin import DB_NAME
 
-DB_NAME = os.path.join(os.getcwd(), 'validator', DB_NAME)
+DB_NAME = os.path.join(os.getcwd(), 'data', DB_NAME)
 
 
 def update_site_availability(site_name: str, availability_date: datetime, num_available: int):

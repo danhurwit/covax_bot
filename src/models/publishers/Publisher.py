@@ -1,6 +1,6 @@
 from typing import List
 
-from scraper.models.Location import Location
+from models.sources.Location import Location
 
 
 class Publisher:
