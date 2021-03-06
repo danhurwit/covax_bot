@@ -5,7 +5,8 @@ from typing import List
 
 from data.db_admin import DB_NAME
 
-DB_NAME = os.path.join(os.getcwd(), 'data', DB_NAME)
+# TODO: This is janky AF. Figure out a better way to do this
+DB_NAME = os.path.join(os.getcwd(), 'src', 'data', DB_NAME)
 
 
 def update_site_availability(site_name: str, availability_date: datetime, num_available: int):
@@ -19,7 +20,7 @@ def update_site_availability(site_name: str, availability_date: datetime, num_av
 def reset_availability(site_names: List[str]):
     query = 'UPDATE appointments SET ' \
             'num_available = 0 ' \
-            'WHERE appointments.site_name IN ({seq})'\
+            'WHERE appointments.site_name IN ({seq})' \
         .format(seq=','.join(['?'] * len(site_names)))
     __execute(query, site_names)
 

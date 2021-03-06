@@ -1,8 +1,16 @@
 from data import appointments_dao
+from .main import app
 from publisher import publisher
 from scraper import scraper
 
 
+@app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    # Calls run() every 60 seconds
+    sender.add_periodic_task(60.0, run.s(), expires=10)
+
+
+@app.task
 def run():
     locations = scraper.scrape()
 
@@ -29,7 +37,8 @@ def update_availability_counts(locations):
     for location in locations:
         if location.has_availability():
             for window in location.get_availability_windows():
-                appointments_dao.update_site_availability(location.get_name(), window.get_date(), window.get_num_available())
+                appointments_dao.update_site_availability(location.get_name(), window.get_date(),
+                                                          window.get_num_available())
         else:
             unavailable_locations.append(location)
     appointments_dao.reset_availability(list(map(lambda l: l.get_name(), unavailable_locations)))
