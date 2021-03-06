@@ -16,39 +16,40 @@ BASE_URL = "https://vaxfinder.mass.gov"
 class MassVax(AppointmentSource):
 
     def scrape_locations(self):
-        html = requests.request(method="get", url=URL)
-        global_soup = BeautifulSoup(str(html.text), "html.parser")
+        html = requests.request(method="get", url=URL).text
+        # html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r', encoding='utf-8').read()  # test data
+        global_soup = BeautifulSoup(str(html), "html.parser")
         num_pages = self.__get_num_pages(global_soup)
 
         locations: List[Location] = []
         for i in range(num_pages):
-            page_html = requests.request(method="get", url=self.get_url_for_page(i + 1))
-            page_soup = BeautifulSoup(str(page_html.text), "html.parser")
+            page_html = requests.request(method="get", url=self.__get_url_for_page(i + 1)).text
+            # page_html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r', encoding='utf-8').read()  # test data
+            page_soup = BeautifulSoup(str(page_html), "html.parser")
             for row in page_soup.find("tbody").find_all("tr"):
                 cells = row.findChildren('td')
                 if cells:
-                    locations.append(self.parse_location_from_row(cells))
+                    locations.append(self.__parse_location_from_row(cells))
 
         self.locations = locations
 
-        # location_result = open("/Users/danhurwit/Desktop/vaccine_availability.html", 'r', encoding='utf-8').read()
-        # self.locations.append(self.__get_location(location_result))
-
-    def parse_location_from_row(self, cells) -> Location:
+    def __parse_location_from_row(self, cells) -> Location:
         availability = cells[2].find("span", "text").string
         details_url = self.__get_location_details_url(cells[0].find('a')['href'])
         if availability == 'Currently Full' or availability == 'See Details':
-            name = ''.join(e for e in cells[0].find('a').string if e.isalnum() or e == ' ').strip()
+            name = ''.join(e for e in cells[0].find('a').string if e.isalnum() or e == ' ' or e == ':').strip()
             last_updated = self.__parse_updated_at(cells[0].find('p', 'location-updated').string)
             return Location(name, details_url, last_updated, [])
         else:
             return self.__get_location(details_url)
 
-    def get_url_for_page(self, page: int):
+    def __get_url_for_page(self, page: int):
         return URL + '&' + 'page={}'.format(page)
 
     def __get_location(self, link: str) -> Location:
-        local_soup = BeautifulSoup(requests.request(method="get", url=link).text, "html.parser")
+        page_html = requests.request(method="get", url=link).text
+        # page_html = open("/Users/danhurwit/Desktop/test_html/massvax/vaccine_availability.html", 'r', encoding='utf-8').read()  # test data
+        local_soup = BeautifulSoup(page_html, "html.parser")
         windows = self.__get_availability_windows(local_soup)
         updated_mins = self.__parse_updated_at(local_soup.find("div", "location-updated").string.strip())
         booking_link = local_soup.find("a", "btn lg primary vertical hide-md-up full-width")['href']
@@ -70,7 +71,6 @@ class MassVax(AppointmentSource):
         return BASE_URL + link
 
     def __parse_updated_at(self, update_string: str) -> int:
-        # update_string.replace("Updated:", "")
         minutes = 0
         hours = 0
         days = 0
