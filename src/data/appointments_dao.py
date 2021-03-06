@@ -1,12 +1,10 @@
-import os
 import sqlite3
 from datetime import datetime
 from typing import List
 
-from data.db_admin import DB_NAME
+from decouple import config
 
-# TODO: This is janky AF. Figure out a better way to do this
-DB_NAME = os.path.join(os.getcwd(), 'src', 'data', DB_NAME)
+DB_URL = config('DB_URL')
 
 
 def update_site_availability(site_name: str, availability_date: datetime, num_available: int):
@@ -38,7 +36,7 @@ def __get_formatted_availability(availability_date) -> str:
 
 
 def __execute_with_results(query: str, values):
-    con = sqlite3.connect(DB_NAME)
+    con = sqlite3.connect(DB_URL)
     cur = con.cursor()
     cur.execute(query, values)
     results = cur.fetchall()
@@ -48,7 +46,7 @@ def __execute_with_results(query: str, values):
 
 
 def __execute_single_result(query: str, values):
-    con = sqlite3.connect(DB_NAME)
+    con = sqlite3.connect(DB_URL)
     cur = con.cursor()
     cur.execute(query, values)
     result = cur.fetchone()
@@ -58,7 +56,7 @@ def __execute_single_result(query: str, values):
 
 
 def __execute(query: str, values):
-    con = sqlite3.connect(DB_NAME)
+    con = sqlite3.connect(DB_URL)
     cur = con.cursor()
     cur.execute(query, values)
     con.commit()

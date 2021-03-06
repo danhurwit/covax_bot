@@ -1,16 +1,8 @@
 from data import appointments_dao
-from .main import app
 from publisher import publisher
 from scraper import scraper
 
 
-@app.on_after_finalize.connect
-def setup_periodic_tasks(sender, **kwargs):
-    # Calls run() every 60 seconds
-    sender.add_periodic_task(60.0, run.s(), expires=10)
-
-
-@app.task
 def run():
     locations = scraper.scrape()
 
