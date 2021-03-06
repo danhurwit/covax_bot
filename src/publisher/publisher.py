@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Iterable
 
 from models.sources.Location import Location
 from publisher.publishers.DiscordPublisher import DiscordPublisher
