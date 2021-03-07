@@ -130,3 +130,4 @@ dmypy.json
 /venv/
 /.idea/
 /src/data/appointments.db
+/deploy_external.sh
