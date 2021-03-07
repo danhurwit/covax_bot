@@ -11,9 +11,13 @@ from models.sources.Location import Location
 
 URL = "https://vaxfinder.mass.gov/?zip_or_city=02139"
 BASE_URL = "https://vaxfinder.mass.gov"
+MASSVAX_NAME = "MassVax"
 
 
 class MassVax(AppointmentSource):
+
+    def get_name(self):
+        return MASSVAX_NAME
 
     def scrape_locations(self):
         html = requests.request(method="get", url=URL).text

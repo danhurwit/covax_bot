@@ -1,16 +1,15 @@
-import itertools
 from typing import List
 
-from models.sources.Location import Location
+from models.sources.AppointmentSource import AppointmentSource
 from scraper.sources.MassVax import MassVax
 
 sources = [MassVax]
 
 
-def scrape() -> List[Location]:
-    locations = []
+def scrape() -> List[AppointmentSource]:
+    scraped_sources = []
     for source in sources:
         s = source()
         s.scrape_locations()
-        locations.append(s.get_locations())
-    return list(itertools.chain(*locations))
+        scraped_sources.append(s)
+    return scraped_sources

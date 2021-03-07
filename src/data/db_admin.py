@@ -7,10 +7,11 @@ def create_appointments_table():
     con = sqlite3.connect(DB_NAME)
     cur = con.cursor()
     cur.execute('''CREATE TABLE appointments(
+                        source text NOT NULL,
                         site_name text NOT NULL, 
                         availability_date text NOT NULL, 
                         num_available real, 
-                        PRIMARY KEY(site_name, availability_date))''')
+                        PRIMARY KEY(source, site_name, availability_date))''')
     con.commit()
     con.close()
 
