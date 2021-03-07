@@ -19,3 +19,6 @@ from within the top level directory
 
 ### within IDE
 `python main.py`
+
+### viewing tasks
+`celery -A src.celery_app events`
