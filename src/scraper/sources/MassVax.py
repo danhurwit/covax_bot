@@ -82,7 +82,12 @@ class MassVax(AppointmentSource):
         for row in local_soup.find_all("tr"):
             cells = row.findChildren('td')
             if cells:
-                windows.append(AvailabilityWindow(int(cells[2].string),
+                num_available = 1
+                try:
+                    num_available = int(cells[2].string)
+                except ValueError:
+                    print("Number available is not a number. Value: {}".format(cells[2].string))
+                windows.append(AvailabilityWindow(num_available,
                                                   datetime.strptime(cells[0].string, '%B %d, %Y')))
         return windows
 

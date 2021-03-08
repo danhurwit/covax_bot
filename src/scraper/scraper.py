@@ -9,8 +9,11 @@ sources = [Cvs, MassVax]
 
 def scrape() -> List[AppointmentSource]:
     scraped_sources = []
-    for source in sources:
-        s = source()
-        s.scrape_locations()
-        scraped_sources.append(s)
+    try:
+        for source in sources:
+            s = source()
+            s.scrape_locations()
+            scraped_sources.append(s)
+    except Exception as e:
+        print(e)
     return scraped_sources
