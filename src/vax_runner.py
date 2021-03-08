@@ -11,10 +11,10 @@ def run():
     sources = scraper.scrape()
     for source in sources:
         locations_to_publish = get_locations_to_publish(source)
-        publisher.publish_locations(locations_to_publish)
+        publisher.publish_locations(source, locations_to_publish)
         update_availability_counts(source)
-        print("Found new availability at: {} / {} sites..."
-              .format(len(locations_to_publish), len(source.get_locations())))
+        print("Found new availability at: {} / {} {} sites..."
+              .format(len(locations_to_publish), len(source.get_locations()), source.get_name()))
 
 
 def get_locations_to_publish(source: AppointmentSource) -> List[Location]:
@@ -26,7 +26,7 @@ def get_locations_to_publish(source: AppointmentSource) -> List[Location]:
         for window in location.get_availability_windows():
             if window.num_available > appointments_dao.get_site_availability(source_name,
                                                                              location.get_name(),
-                                                                             window.date):
+                                                                             window.get_date()):
                 locs.add(location)
     return locs
 

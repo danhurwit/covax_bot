@@ -1,6 +1,6 @@
 import re
-from datetime import datetime
-from typing import List
+from datetime import datetime, timedelta
+from typing import List, Iterable
 
 import requests
 from bs4 import BeautifulSoup
@@ -37,13 +37,25 @@ class MassVax(AppointmentSource):
 
         self.locations = locations
 
+    def get_publish_messages(self, locations: Iterable[Location]) -> List[str]:
+        messages = []
+        for location in locations:
+            base = "Site Name: {}\nBooking Link: {}\nAvailability:\n".format(location.get_name(),
+                                                                             location.get_link())
+            for window in location.get_availability_windows():
+                base += ("\t" + "{} available on {}".format(window.get_num_available(),
+                                                            window.get_date().strftime("%Y-%m-%d"))
+                         + "\n")
+            messages.append(base)
+        return messages
+
     def __parse_location_from_row(self, cells) -> Location:
         availability = cells[2].find("span", "text").string
         details_url = self.__get_location_details_url(cells[0].find('a')['href'])
         if availability == 'Currently Full' or availability == 'See Details':
             name = ''.join(e for e in cells[0].find('a').string if e.isalnum() or e == ' ' or e == ':').strip()
             last_updated = self.__parse_updated_at(cells[0].find('p', 'location-updated').string)
-            return Location(name, details_url, last_updated, [])
+            return Location(name, details_url, self.__datetime_from_minutes(last_updated), [])
         else:
             return self.__get_location(details_url)
 
@@ -58,9 +70,12 @@ class MassVax(AppointmentSource):
         updated_mins = self.__parse_updated_at(local_soup.find("div", "location-updated").string.strip())
         booking_link = local_soup.find("a", "btn lg primary vertical hide-md-up full-width")['href']
         return Location(name=local_soup.find("section", "section pt").find('h1').string,
-                        last_updated_mins=updated_mins,
+                        updated_at=self.__datetime_from_minutes(updated_mins),
                         booking_link=booking_link,
                         availability_windows=windows)
+
+    def __datetime_from_minutes(self, updated_mins):
+        return datetime.now() - timedelta(minutes=updated_mins)
 
     def __get_availability_windows(self, local_soup):
         windows = []

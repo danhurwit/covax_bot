@@ -14,6 +14,3 @@ class AvailabilityWindow:
 
     def get_date(self) -> datetime:
         return self.date
-
-    def get_formatted_availability(self) -> str:
-        return "{} available on {}".format(self.num_available, self.date.strftime("%Y-%m-%d"))

@@ -1,9 +1,10 @@
 from typing import List
 
 from models.sources.AppointmentSource import AppointmentSource
+from scraper.sources.Cvs import Cvs
 from scraper.sources.MassVax import MassVax
 
-sources = [MassVax]
+sources = [Cvs, MassVax]
 
 
 def scrape() -> List[AppointmentSource]:

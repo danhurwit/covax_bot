@@ -1,5 +1,6 @@
 from typing import Iterable
 
+from models.sources.AppointmentSource import AppointmentSource
 from models.sources.Location import Location
 from publisher.publishers.DiscordPublisher import DiscordPublisher
 
@@ -10,7 +11,7 @@ def publish(location: Location):
     publish_locations([location])
 
 
-def publish_locations(locations: Iterable[Location]):
+def publish_locations(source: AppointmentSource, locations: Iterable[Location]):
     for publisher in publishers:
         p = publisher()
-        p.publish(locations)
+        p.publish(source, locations)
