@@ -86,7 +86,7 @@ class MassVax(AppointmentSource):
                 try:
                     num_available = int(cells[2].string)
                 except ValueError:
-                    print("Number available is not a number. Value: {}".format(cells[2].string))
+                    print("num_available failed to parse. Value: {}".format(cells[2].string))
                 windows.append(AvailabilityWindow(num_available,
                                                   datetime.strptime(cells[0].string, '%B %d, %Y')))
         return windows
