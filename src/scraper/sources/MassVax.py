@@ -43,9 +43,10 @@ class MassVax(AppointmentSource):
             base = "Site Name: {}\nBooking Link: {}\nAvailability:\n".format(location.get_name(),
                                                                              location.get_link())
             for window in location.get_availability_windows():
-                base += ("\t" + "{} available on {}".format(window.get_num_available(),
-                                                            window.get_date().strftime("%Y-%m-%d"))
-                         + "\n")
+                if window.get_num_available() > 0:
+                    base += ("\t" + "{} available on {}".format(window.get_num_available(),
+                                                                window.get_date().strftime("%Y-%m-%d"))
+                             + "\n")
             messages.append(base)
         return messages
 
