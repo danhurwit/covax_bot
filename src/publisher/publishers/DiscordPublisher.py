@@ -34,7 +34,7 @@ class DiscordPublisher(Publisher):
     def __get_cvs_embed(self, locations):
         embed = DiscordEmbed(title='Appointments now available!',
                              description='CVS has added new appointments',
-                             color='03b2f8')
+                             color='FF5C5C')
         embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/CVS_Health_Logo.svg/2560px-CVS_Health_Logo.svg.png")
         embed.add_embed_field(name="Booking Link:", value=CVS_BOOKING_URL, inline=False)
         embed.add_embed_field(name="Sites:", value="\n".join([l.get_name() for l in locations]), inline=False)
