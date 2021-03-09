@@ -27,8 +27,7 @@ class DiscordPublisher(Publisher):
                                          range(0, len(windows), self.__MAX_WINDOWS_PER_EMBED)]:
                         webhook.add_embed(self.__get_massvax_embed(location, window_chunk))
         elif source.get_name() == CVS_NAME:
-            embed = self.__get_cvs_embed(locations)
-            webhook.add_embed(embed)
+            webhook.add_embed(self.__get_cvs_embed(locations))
         webhook.execute()
 
     def __get_cvs_embed(self, locations):

@@ -1,5 +1,7 @@
+import traceback
 from typing import Iterable
 
+from logger import logger
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.Location import Location
 from publisher.publishers.DiscordPublisher import DiscordPublisher
@@ -13,5 +15,8 @@ def publish(location: Location):
 
 def publish_locations(source: AppointmentSource, locations: Iterable[Location]):
     for publisher in publishers:
-        p = publisher()
-        p.publish(source, locations)
+        try:
+            p = publisher()
+            p.publish(source, locations)
+        except:
+            logger.log(traceback.format_exc())
