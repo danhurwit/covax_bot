@@ -24,6 +24,11 @@ class Cvs(AppointmentSource):
         for site in sites:
             site_name = CVS_NAME + ': ' + site['city'].capitalize()
             status = site['status']
+            # if site['city'] == 'NEWTON' or site['city'] == 'GREENFIELD':
+            #     locations.append(Location(site_name,
+            #                               BOOKING_URL,
+            #                               datetime.now(),
+            #                               [AvailabilityWindow(1, datetime.now())]))
             if not status == 'Fully Booked':
                 locations.append(Location(site_name,
                                           BOOKING_URL,
@@ -33,7 +38,7 @@ class Cvs(AppointmentSource):
                 locations.append(Location(site_name, BOOKING_URL, datetime.now(), []))
         self.locations = locations
 
-    def get_publish_messages(self, locations: Iterable[Location]) -> List[str]:
+    def get_availability_message(self, locations: Iterable[Location]) -> List[str]:
         messages = []
         for location in locations:
             base = "Site Name: {}\nBooking Link: {}\n".format(location.get_name(), location.get_link())

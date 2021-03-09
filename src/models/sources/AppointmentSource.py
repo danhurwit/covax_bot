@@ -18,5 +18,5 @@ class AppointmentSource:
     def get_name(self):
         return self.name
 
-    def get_publish_messages(self, locations: Iterable[Location]) -> List[str]:
+    def get_availability_message(self, locations: Iterable[Location]) -> List[str]:
         pass

@@ -20,15 +20,17 @@ class MassVax(AppointmentSource):
         return MASSVAX_NAME
 
     def scrape_locations(self):
-        html = requests.request(method="get", url=URL).text
-        # html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r', encoding='utf-8').read()  # test data
+        # html = requests.request(method="get", url=URL).text
+        html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r',
+                    encoding='utf-8').read()  # test data
         global_soup = BeautifulSoup(str(html), "html.parser")
         num_pages = self.__get_num_pages(global_soup)
 
         locations: List[Location] = []
         for i in range(num_pages):
-            page_html = requests.request(method="get", url=self.__get_url_for_page(i + 1)).text
-            # page_html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r', encoding='utf-8').read()  # test data
+            # page_html = requests.request(method="get", url=self.__get_url_for_page(i + 1)).text
+            page_html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r',
+                             encoding='utf-8').read()  # test data
             page_soup = BeautifulSoup(str(page_html), "html.parser")
             for row in page_soup.find("tbody").find_all("tr"):
                 cells = row.findChildren('td')
@@ -37,7 +39,7 @@ class MassVax(AppointmentSource):
 
         self.locations = locations
 
-    def get_publish_messages(self, locations: Iterable[Location]) -> List[str]:
+    def get_availability_message(self, locations: Iterable[Location]) -> List[str]:
         messages = []
         for location in locations:
             base = "Site Name: {}\nBooking Link: {}\nAvailability:\n".format(location.get_name(),
@@ -64,8 +66,9 @@ class MassVax(AppointmentSource):
         return URL + '&' + 'page={}'.format(page)
 
     def __get_location(self, link: str) -> Location:
-        page_html = requests.request(method="get", url=link).text
-        # page_html = open("/Users/danhurwit/Desktop/test_html/massvax/vaccine_availability.html", 'r', encoding='utf-8').read()  # test data
+        # page_html = requests.request(method="get", url=link).text
+        page_html = open("/Users/danhurwit/Desktop/test_html/massvax/vaccine_availability.html", 'r',
+                         encoding='utf-8').read()  # test data
         local_soup = BeautifulSoup(page_html, "html.parser")
         windows = self.__get_availability_windows(local_soup)
         updated_mins = self.__parse_updated_at(local_soup.find("div", "location-updated").string.strip())
@@ -88,8 +91,9 @@ class MassVax(AppointmentSource):
                     num_available = int(cells[2].string)
                 except ValueError:
                     print("num_available failed to parse. Value: {}".format(cells[2].string))
-                windows.append(AvailabilityWindow(num_available,
-                                                  datetime.strptime(cells[0].string, '%B %d, %Y')))
+                if num_available > 0:
+                    windows.append(AvailabilityWindow(num_available,
+                                                      datetime.strptime(cells[0].string, '%B %d, %Y')))
         return windows
 
     def __get_location_details_url(self, link: str) -> str:

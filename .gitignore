@@ -131,3 +131,4 @@ dmypy.json
 /.idea/
 /src/data/appointments.db
 /deploy_external.sh
+/delete_all.sql
