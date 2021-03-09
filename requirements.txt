@@ -12,7 +12,9 @@ click-didyoumean==0.0.3
 click-plugins==1.1.1
 click-repl==0.1.6
 discord==1.0.1
+discord-webhook==0.12.0
 discord.py==1.6.0
+discordwebhook==1.0.1
 idna==2.10
 kombu==5.0.2
 multidict==5.1.0
