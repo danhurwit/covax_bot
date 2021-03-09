@@ -18,7 +18,7 @@ class Cvs(AppointmentSource):
         "FF5C5C")
 
     def scrape_locations(self):
-        json = requests.request(method="get", url=self.scrape_url).json()
+        json = requests.get(url=self.scrape_url).json()
         sites = json['responsePayloadData']['data']['MA']
         locations = []
         for site in sites:
@@ -37,11 +37,3 @@ class Cvs(AppointmentSource):
             else:
                 locations.append(Location(site_name, self.get_global_booking_link(), datetime.now(), []))
         self.locations = locations
-
-    def get_availability_message(self, locations: Iterable[Location]) -> List[str]:
-        messages = []
-        for location in locations:
-            base = "Site Name: {}\nBooking Link: {}\n".format(location.get_name(), location.get_link())
-            base += "CVS has added appointments\n"
-            messages.append(base)
-        return messages

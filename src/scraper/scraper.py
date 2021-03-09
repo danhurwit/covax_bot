@@ -3,10 +3,12 @@ from typing import List
 
 from logger import logger
 from models.sources.AppointmentSource import AppointmentSource
+from scraper.sources.Walgreens import Walgreens
 from scraper.sources.Cvs import Cvs
 from scraper.sources.MassVax import MassVax
 
-sources = [Cvs, MassVax]
+# sources = [Cvs, MassVax, Walgreens]
+sources = [Walgreens]
 
 
 def scrape() -> List[AppointmentSource]:

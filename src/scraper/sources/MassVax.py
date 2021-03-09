@@ -22,7 +22,7 @@ class MassVax(AppointmentSource):
         "03b2f8")
 
     def scrape_locations(self):
-        html = requests.request(method="get", url=self.scrape_url).text
+        html = requests.get(url=self.scrape_url).text
         # html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r', encoding='utf-8').read()  # test data
         global_soup = BeautifulSoup(str(html), "html.parser")
         num_pages = self.__get_num_pages(global_soup)
@@ -38,19 +38,6 @@ class MassVax(AppointmentSource):
                     locations.append(self.__parse_location_from_row(cells))
 
         self.locations = locations
-
-    def get_availability_message(self, locations: Iterable[Location]) -> List[str]:
-        messages = []
-        for location in locations:
-            base = "Site Name: {}\nBooking Link: {}\nAvailability:\n".format(location.get_name(),
-                                                                             location.get_link())
-            for window in location.get_availability_windows():
-                if window.get_num_available() > 0:
-                    base += ("\t" + "{} available on {}".format(window.get_num_available(),
-                                                                window.get_date().strftime("%Y-%m-%d"))
-                             + "\n")
-            messages.append(base)
-        return messages
 
     def __parse_location_from_row(self, cells) -> Location:
         availability = cells[2].find("span", "text").string
