@@ -35,15 +35,13 @@ def get_locations_to_publish(source: AppointmentSource) -> List[Location]:
 def update_availability_counts(source: AppointmentSource):
     locations = source.get_locations()
     source_name = source.get_name()
-    unavailable_locations = []
+    available_locations = []
     for location in locations:
         if location.has_availability():
+            available_locations.append(location)
             for window in location.get_availability_windows():
                 appointments_dao.update_site_availability(source_name,
                                                           location.get_name(),
                                                           window.get_date(),
                                                           window.get_num_available())
-        else:
-            unavailable_locations.append(location)
-    appointments_dao.reset_availability(source_name,
-                                        list(map(lambda l: l.get_name(), unavailable_locations)))
+    appointments_dao.reset_availability_excluding(source_name, list(map(lambda l: l.get_name(), available_locations)))

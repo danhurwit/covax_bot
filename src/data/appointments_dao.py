@@ -15,11 +15,11 @@ def update_site_availability(source: str, site_name: str, availability_date: dat
     __execute(query, (source, site_name, availability_date, num_available, num_available))
 
 
-def reset_availability(source: str, site_names: List[str]):
+def reset_availability_excluding(source: str, site_names: List[str]):
     query = 'UPDATE appointments SET ' \
             'num_available = 0 ' \
             'WHERE source = ? ' \
-            'AND appointments.site_name IN ({seq})' \
+            'AND appointments.site_name NOT IN ({seq})' \
         .format(seq=','.join(['?'] * len(site_names)))
     __execute(query, (source,) + tuple(site_names))
 
