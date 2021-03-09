@@ -5,37 +5,37 @@ import requests
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
+from models.sources.DisplayProperties import DisplayProperties
 from models.sources.Location import Location
-
-CVS_NAME = "CVS"
-
-URL = 'https://www.cvs.com/immunizations/covid-19-vaccine/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo'
-BOOKING_URL = 'https://www.cvs.com/vaccine/intake/store/cvd-schedule?icid=coronavirus-lp-vaccine-ma-statetool'
 
 
 class Cvs(AppointmentSource):
-    def get_name(self):
-        return CVS_NAME
+    name = "CVS"
+    scrape_url = 'https://www.cvs.com/immunizations/covid-19-vaccine/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo'
+    global_booking_link = 'https://www.cvs.com/vaccine/intake/store/cvd-schedule?icid=coronavirus-lp-vaccine-ma-statetool'
+    display_properties = DisplayProperties(
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/CVS_Health_Logo.svg/2560px-CVS_Health_Logo.svg.png",
+        "FF5C5C")
 
     def scrape_locations(self):
-        json = requests.request(method="get", url=URL).json()
+        json = requests.request(method="get", url=self.scrape_url).json()
         sites = json['responsePayloadData']['data']['MA']
         locations = []
         for site in sites:
-            site_name = CVS_NAME + ': ' + site['city'].capitalize()
+            site_name = self.name + ': ' + site['city'].capitalize()
             status = site['status']
             # if site['city'] == 'NEWTON' or site['city'] == 'GREENFIELD':
             #     locations.append(Location(site_name,
-            #                               BOOKING_URL,
+            #                               self.global_booking_link,
             #                               datetime.now(),
             #                               [AvailabilityWindow(1, datetime.now())]))
             if not status == 'Fully Booked':
                 locations.append(Location(site_name,
-                                          BOOKING_URL,
+                                          self.get_global_booking_link(),
                                           datetime.now(),
                                           [AvailabilityWindow(1, datetime.now())]))
             else:
-                locations.append(Location(site_name, BOOKING_URL, datetime.now(), []))
+                locations.append(Location(site_name, self.get_global_booking_link(), datetime.now(), []))
         self.locations = locations
 
     def get_availability_message(self, locations: Iterable[Location]) -> List[str]:

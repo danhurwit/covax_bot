@@ -7,20 +7,22 @@ from bs4 import BeautifulSoup
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
+from models.sources.DisplayProperties import DisplayProperties
 from models.sources.Location import Location
-
-URL = "https://vaxfinder.mass.gov/?zip_or_city=02139"
-BASE_URL = "https://vaxfinder.mass.gov"
-MASSVAX_NAME = "MassVax"
 
 
 class MassVax(AppointmentSource):
-
-    def get_name(self):
-        return MASSVAX_NAME
+    __base_url = "https://vaxfinder.mass.gov"
+    scrape_url = "https://vaxfinder.mass.gov/?zip_or_city=02139"
+    has_time_availability = True
+    has_location_booking_links = True
+    name = "MassVax"
+    display_properties = DisplayProperties(
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Seal_of_Massachusetts.svg/1200px-Seal_of_Massachusetts.svg.png",
+        "03b2f8")
 
     def scrape_locations(self):
-        html = requests.request(method="get", url=URL).text
+        html = requests.request(method="get", url=self.scrape_url).text
         # html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r', encoding='utf-8').read()  # test data
         global_soup = BeautifulSoup(str(html), "html.parser")
         num_pages = self.__get_num_pages(global_soup)
@@ -61,7 +63,7 @@ class MassVax(AppointmentSource):
             return self.__get_location(details_url)
 
     def __get_url_for_page(self, page: int):
-        return URL + '&' + 'page={}'.format(page)
+        return self.scrape_url + '&' + 'page={}'.format(page)
 
     def __get_location(self, link: str) -> Location:
         page_html = requests.request(method="get", url=link).text
@@ -94,7 +96,7 @@ class MassVax(AppointmentSource):
         return windows
 
     def __get_location_details_url(self, link: str) -> str:
-        return BASE_URL + link
+        return self.__base_url + link
 
     def __parse_updated_at(self, update_string: str) -> int:
         minutes = 0
