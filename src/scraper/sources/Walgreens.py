@@ -19,7 +19,7 @@ class Walgreens(AppointmentSource):
                          "appointmentAvailability": {"startDateTime": "2021-03-09"}, "radius": 25}
     __headers = {'cookie': config('WALGREENS_COOKIE'), 'x-xsrf-token': config('WALGREENS_TOKEN')}
     #  FIXME: change once walgreens has availability
-    global_booking_link = 'https://www.walgreens.com/findcare/vaccination/covid-19/location-screening'
+    global_booking_link = 'https://www.walgreens.com/topic/promotion/covid-vaccine.jsp'
     display_properties = DisplayProperties(
         "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Walgreens_Logo.svg/2560px-Walgreens_Logo.svg.png",
         "3CB371")
