@@ -1,4 +1,5 @@
 from datetime import datetime
+from pprint import pprint
 
 import requests
 
@@ -20,14 +21,16 @@ class Walgreens(AppointmentSource):
         "3CB371")
 
     def scrape_locations(self):
-        headers = self.__refresh_cookies();
+        headers = self.__refresh_cookies()
         response = requests.post(url=self.scrape_url,
                                  json=self.__request_payload,
-                                 headers=headers).json()
+                                 headers=headers)
         # response = {"appointmentsAvailable": "true", "stateName": "Massachusetts", "stateCode": "MA",
         #             "zipCode": "02142", "radius": 25, "days": 3}
+        pprint(response.status_code)
+        pprint(response.reason)
         locations = []
-        if response['appointmentsAvailable']:
+        if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
                                       datetime.now(),
