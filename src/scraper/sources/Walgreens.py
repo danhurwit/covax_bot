@@ -21,14 +21,13 @@ class Walgreens(AppointmentSource):
         "3CB371")
 
     def scrape_locations(self):
-        headers = self.__refresh_cookies()
+        headers, cookies = self.__refresh_cookies()
         response = requests.post(url=self.scrape_url,
                                  json=self.__request_payload,
-                                 headers=headers)
+                                 headers=headers,
+                                 cookies=cookies)
         # response = {"appointmentsAvailable": "true", "stateName": "Massachusetts", "stateCode": "MA",
         #             "zipCode": "02142", "radius": 25, "days": 3}
-        pprint(response.status_code)
-        pprint(response.reason)
         locations = []
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
@@ -39,4 +38,4 @@ class Walgreens(AppointmentSource):
 
     def __refresh_cookies(self):
         resp = requests.get(self.__cookie_refresh_url)
-        return {'cookie': resp.headers.get('set-cookie'), 'x-xsrf-token': resp.json()['csrfToken']}
+        return {'x-xsrf-token': resp.json()['csrfToken']}, resp.cookies.copy()
