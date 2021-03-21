@@ -7,7 +7,8 @@ from scraper.sources.Walgreens import Walgreens
 from scraper.sources.Cvs import Cvs
 from scraper.sources.MassVax import MassVax
 
-sources = [Cvs, MassVax, Walgreens]
+# sources = [Cvs, MassVax, Walgreens]
+sources = [Walgreens]
 
 
 def scrape() -> List[AppointmentSource]:
