@@ -12,8 +12,10 @@ from models.sources.Location import Location
 class Walgreens(AppointmentSource):
     name = "Walgreens"
     scrape_url = 'https://www.walgreens.com/hcschedulersvc/svc/v1/immunizationLocations/availability'
-    __request_payload = {"serviceId": "99", "position": {"latitude": 42.36475590000001, "longitude": -71.1032591},
-                         "appointmentAvailability": {"startDateTime": "2021-03-09"}, "radius": 25}
+    __request_payload = {"serviceId": "99",
+                         "position": {"latitude": 42.36475590000001, "longitude": -71.1032591},
+                         "appointmentAvailability": {"startDateTime": "2021-03-22"},
+                         "radius": 25}
     __cookie_refresh_url = 'https://www.walgreens.com/topic/v1/csrf'
     global_booking_link = 'https://www.walgreens.com/topic/promotion/covid-vaccine.jsp'
     display_properties = DisplayProperties(
