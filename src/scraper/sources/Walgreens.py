@@ -3,7 +3,7 @@ from pprint import pprint
 
 import requests
 from decouple import config
-from requests import utils
+from requests import utils, Session
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
@@ -25,13 +25,10 @@ class Walgreens(AppointmentSource):
         "3CB371")
 
     def scrape_locations(self):
-        csrf_token, cookies = self.__refresh_cookies()
-        headers = requests.utils.default_headers()
-        headers.update({'x-xsrf-token': csrf_token,
-                        'cookie': cookies})
-        response = requests.post(url=self.scrape_url,
-                                 json=self.__request_payload,
-                                 headers=headers)
+        session, token = self.__get_session()
+        session.headers.update({'x-xsrf-token': token})
+        response = session.post(url=self.scrape_url,
+                                json=self.__request_payload)
         # response = {"appointmentsAvailable": "true", "stateName": "Massachusetts", "stateCode": "MA",
         #             "zipCode": "02142", "radius": 25, "days": 3}
         locations = []
@@ -42,6 +39,9 @@ class Walgreens(AppointmentSource):
                                       [AvailabilityWindow(1, datetime.now())]))
         self.locations = locations
 
-    def __refresh_cookies(self):
-        resp = requests.get(self.__cookie_refresh_url)
-        return resp.json()['csrfToken'], resp.headers.get('set-cookie')
+    def __get_session(self):
+        s = Session()
+        s.get('https://www.walgreens.com/topic/promotion/covid-vaccine.jsp')
+        csrf_response = s.get(self.__cookie_refresh_url)
+        s.get('https://www.walgreens.com/findcare/vaccination/covid-19?ban=covid_vaccine_landing_schedule')
+        return s, csrf_response.json()['csrfToken']
