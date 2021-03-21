@@ -2,6 +2,7 @@ from datetime import datetime
 from pprint import pprint
 
 import requests
+from decouple import config
 from requests import utils
 
 from models.sources.AppointmentSource import AppointmentSource
@@ -26,13 +27,11 @@ class Walgreens(AppointmentSource):
     def scrape_locations(self):
         csrf_token, cookies = self.__refresh_cookies()
         headers = requests.utils.default_headers()
-        headers.update({'x-xsrf-token': csrf_token,
-                        'User-Agent': 'python-requests/2.25.1'})
-
+        headers.update({'x-xsrf-token': config('WALGREENS_TOKEN'),
+                        'cookie': config('WALGREENS_COOKIE')})
         response = requests.post(url=self.scrape_url,
                                  json=self.__request_payload,
-                                 headers=headers,
-                                 cookies=cookies)
+                                 headers=headers)
         # response = {"appointmentsAvailable": "true", "stateName": "Massachusetts", "stateCode": "MA",
         #             "zipCode": "02142", "radius": 25, "days": 3}
         locations = []
