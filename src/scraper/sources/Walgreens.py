@@ -27,8 +27,8 @@ class Walgreens(AppointmentSource):
     def scrape_locations(self):
         csrf_token, cookies = self.__refresh_cookies()
         headers = requests.utils.default_headers()
-        headers.update({'x-xsrf-token': config('WALGREENS_TOKEN'),
-                        'cookie': config('WALGREENS_COOKIE')})
+        headers.update({'x-xsrf-token': csrf_token,
+                        'cookie': cookies})
         response = requests.post(url=self.scrape_url,
                                  json=self.__request_payload,
                                  headers=headers)
