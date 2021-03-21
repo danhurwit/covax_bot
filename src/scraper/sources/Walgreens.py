@@ -44,4 +44,4 @@ class Walgreens(AppointmentSource):
 
     def __refresh_cookies(self):
         resp = requests.get(self.__cookie_refresh_url)
-        return resp.json()['csrfToken'], resp.cookies.copy()
+        return resp.json()['csrfToken'], resp.headers.get('set-cookie')
