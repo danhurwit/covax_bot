@@ -1,10 +1,7 @@
 from datetime import datetime
-from pprint import pprint
-from urllib.request import Request
 
-import requests
-from decouple import config
-from requests import utils, Session
+import pprint
+from requests import Session
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
@@ -14,12 +11,11 @@ from models.sources.Location import Location
 
 class Walgreens(AppointmentSource):
     name = "Walgreens"
-    scrape_url = 'https://www.walgreens.com/hcschedulersvc/svc/v1/immunizationLocations/availability'
+    scrape_url = 'https://www.walgreens.com/hcschedulersvc/svc/v1/immunizationLocations/availability/'
     __request_payload = {"serviceId": "99",
                          "position": {"latitude": 42.36475590000001, "longitude": -71.1032591},
-                         "appointmentAvailability": {"startDateTime": "2021-03-21"},
+                         "appointmentAvailability": {"startDateTime": "2021-03-22"},
                          "radius": 25}
-    __cookie_refresh_url = 'https://www.walgreens.com/topic/v1/csrf'
     global_booking_link = 'https://www.walgreens.com/topic/promotion/covid-vaccine.jsp'
     display_properties = DisplayProperties(
         "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Walgreens_Logo.svg/2560px-Walgreens_Logo.svg.png",
@@ -27,20 +23,9 @@ class Walgreens(AppointmentSource):
 
     def scrape_locations(self):
         session, token = self.__get_session()
-        session.headers.update({
-            'x-xsrf-token': token,
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'cors',
-            'dnt': '1',
-            'origin': 'https://www.walgreens.com',
-            'referer': 'https://www.walgreens.com/findcare/vaccination/covid-19/location-screening',
-        })
-        pprint(session.cookies)
-        pprint(session.headers)
+        session.headers.update({'x-xsrf-token': token})
         response = session.post(url=self.scrape_url,
                                 json=self.__request_payload)
-        # response = {"appointmentsAvailable": "true", "stateName": "Massachusetts", "stateCode": "MA",
-        #             "zipCode": "02142", "radius": 25, "days": 3}
         locations = []
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
@@ -51,8 +36,7 @@ class Walgreens(AppointmentSource):
 
     def __get_session(self):
         s = Session()
-        s.headers.update({'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
         s.get('https://www.walgreens.com/topic/promotion/covid-vaccine.jsp')
-        csrf_response = s.get(self.__cookie_refresh_url)
+        csrf_response = s.get('https://www.walgreens.com/topic/v1/csrf')
         s.get('https://www.walgreens.com/findcare/vaccination/covid-19?ban=covid_vaccine_landing_schedule')
         return s, csrf_response.json()['csrfToken']
