@@ -33,8 +33,10 @@ class Walgreens(AppointmentSource):
             'sec-fetch-mode': 'cors',
             'dnt': '1',
             'origin': 'https://www.walgreens.com',
-            'authority': 'www.walgreens.com'
+            'referer': 'https://www.walgreens.com/findcare/vaccination/covid-19/location-screening',
         })
+        pprint(session.cookies)
+        pprint(session.headers)
         response = session.post(url=self.scrape_url,
                                 json=self.__request_payload)
         # response = {"appointmentsAvailable": "true", "stateName": "Massachusetts", "stateCode": "MA",
@@ -49,6 +51,7 @@ class Walgreens(AppointmentSource):
 
     def __get_session(self):
         s = Session()
+        s.headers.update({'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
         s.get('https://www.walgreens.com/topic/promotion/covid-vaccine.jsp')
         csrf_response = s.get(self.__cookie_refresh_url)
         s.get('https://www.walgreens.com/findcare/vaccination/covid-19?ban=covid_vaccine_landing_schedule')
