@@ -2,6 +2,7 @@ from datetime import datetime
 from pprint import pprint
 
 import requests
+from requests import utils
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
@@ -14,7 +15,7 @@ class Walgreens(AppointmentSource):
     scrape_url = 'https://www.walgreens.com/hcschedulersvc/svc/v1/immunizationLocations/availability'
     __request_payload = {"serviceId": "99",
                          "position": {"latitude": 42.36475590000001, "longitude": -71.1032591},
-                         "appointmentAvailability": {"startDateTime": "2021-03-22"},
+                         "appointmentAvailability": {"startDateTime": "2021-03-21"},
                          "radius": 25}
     __cookie_refresh_url = 'https://www.walgreens.com/topic/v1/csrf'
     global_booking_link = 'https://www.walgreens.com/topic/promotion/covid-vaccine.jsp'
@@ -23,7 +24,11 @@ class Walgreens(AppointmentSource):
         "3CB371")
 
     def scrape_locations(self):
-        headers, cookies = self.__refresh_cookies()
+        csrf_token, cookies = self.__refresh_cookies()
+        headers = requests.utils.default_headers()
+        headers.update({'x-xsrf-token': csrf_token,
+                        'User-Agent': 'python-requests/2.25.1'})
+
         response = requests.post(url=self.scrape_url,
                                  json=self.__request_payload,
                                  headers=headers,
@@ -40,4 +45,4 @@ class Walgreens(AppointmentSource):
 
     def __refresh_cookies(self):
         resp = requests.get(self.__cookie_refresh_url)
-        return {'x-xsrf-token': resp.json()['csrfToken']}, resp.cookies.copy()
+        return resp.json()['csrfToken'], resp.cookies.copy()
