@@ -39,5 +39,17 @@ class Walgreens(AppointmentSource):
         s = Session()
         s.headers.update({"User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
         csrf_response = s.get('https://www.walgreens.com/topic/v1/csrf')
-        s.headers.update({'X-XSRF-TOKEN': csrf_response.json()['csrfToken']})
+        s.headers.update({
+            'X-XSRF-TOKEN': csrf_response.json()['csrfToken'],
+            'authority': 'www.walgreens.com',
+            'dnt': '1',
+            'accept-language': 'en-US,en;q=0.9',
+            'origin': 'https://www.walgreens.com',
+            'accept': 'application/json, text/plain, */*',
+            'content-type': 'application/json; charset=UTF-8',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-dest': 'empty',
+            'referer': 'https://www.walgreens.com/findcare/vaccination/covid-19/location-screening'
+        })
         return s
