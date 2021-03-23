@@ -24,8 +24,7 @@ class Walgreens(AppointmentSource):
 
     def scrape_locations(self):
         logging.basicConfig(level=logging.DEBUG)
-        session, token = self.__get_session()
-        session.headers.update({'x-xsrf-token': token})
+        session = self.__get_session()
         response = session.post(url=self.scrape_url,
                                 json=self.__request_payload)
         locations = []
@@ -38,6 +37,7 @@ class Walgreens(AppointmentSource):
 
     def __get_session(self):
         s = Session()
-        s.headers.update({"user-agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
+        s.headers.update({"User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
         csrf_response = s.get('https://www.walgreens.com/topic/v1/csrf')
-        return s, csrf_response.json()['csrfToken']
+        s.headers.update({'X-XSRF-TOKEN': csrf_response.json()['csrfToken']})
+        return s
