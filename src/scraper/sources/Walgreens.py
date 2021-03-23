@@ -39,7 +39,5 @@ class Walgreens(AppointmentSource):
     def __get_session(self):
         s = Session()
         s.headers.update({"user-agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
-        s.get('https://www.walgreens.com/topic/promotion/covid-vaccine.jsp')
         csrf_response = s.get('https://www.walgreens.com/topic/v1/csrf')
-        s.get('https://www.walgreens.com/findcare/vaccination/covid-19?ban=covid_vaccine_landing_schedule')
         return s, csrf_response.json()['csrfToken']
