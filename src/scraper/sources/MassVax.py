@@ -1,6 +1,6 @@
 import re
 from datetime import datetime, timedelta
-from typing import List, Iterable
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup
@@ -13,7 +13,7 @@ from models.sources.Location import Location
 
 class MassVax(AppointmentSource):
     __base_url = "https://vaxfinder.mass.gov"
-    scrape_url = "https://vaxfinder.mass.gov/?zip_or_city=02139"
+    scrape_url = "https://vaxfinder.mass.gov/?zip_or_city=02139&vaccines_available=on&q="
     has_time_availability = True
     has_location_booking_links = True
     name = "MassVax"
@@ -32,10 +32,12 @@ class MassVax(AppointmentSource):
             page_html = requests.request(method="get", url=self.__get_url_for_page(i + 1)).text
             # page_html = open("/Users/danhurwit/Desktop/test_html/massvax/locations_available.htm", 'r', encoding='utf-8').read()  # test data
             page_soup = BeautifulSoup(str(page_html), "html.parser")
-            for row in page_soup.find("tbody").find_all("tr"):
-                cells = row.findChildren('td')
-                if cells:
-                    locations.append(self.__parse_location_from_row(cells))
+            locations_table = page_soup.find("tbody")
+            if locations_table:
+                for row in locations_table.find_all("tr"):
+                    cells = row.findChildren('td')
+                    if cells:
+                        locations.append(self.__parse_location_from_row(cells))
 
         self.locations = locations
 
@@ -90,18 +92,24 @@ class MassVax(AppointmentSource):
         hours = 0
         days = 0
         weeks = 0
-        for part in update_string.split(","):
-            if part.find("minute") != -1:
-                minutes = int(re.findall(r'\d+', part).pop())
-            elif part.find("hour") != -1:
-                hours = int(re.findall(r'\d+', part).pop())
-            elif part.find("day") != -1:
-                days = int(re.findall(r'\d+', part).pop())
-            elif part.find("week") != -1:
-                weeks = int(re.findall(r'\d+', part).pop())
+        try:
+            for part in update_string.split(","):
+                if part.find("minute") != -1:
+                    minutes = int(re.findall(r'\d+', part).pop())
+                elif part.find("hour") != -1:
+                    hours = int(re.findall(r'\d+', part).pop())
+                elif part.find("day") != -1:
+                    days = int(re.findall(r'\d+', part).pop())
+                elif part.find("week") != -1:
+                    weeks = int(re.findall(r'\d+', part).pop())
+        except IndexError:
+            print("Unable to parse updated at string: " + update_string)
         return (weeks * 7 * 24 * 60) + (days * 24 * 60) + (hours * 60) + minutes
 
     def __get_num_pages(self, global_soup) -> int:
-        pagination_string: str = global_soup.find("div", "pagination").find("p", "current").string
-        page_string = pagination_string.strip().split(" ").pop().replace(".", "")
-        return int(page_string)
+        paginated = global_soup.find("div", "pagination")
+        if paginated:
+            pagination_string: str = paginated.find("p", "current").string
+            page_string = pagination_string.strip().split(" ").pop().replace(".", "")
+            return int(page_string)
+        return 1
