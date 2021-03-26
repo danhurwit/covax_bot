@@ -36,7 +36,7 @@ class Walgreens(AppointmentSource):
         response = session.post(url=self.scrape_url,
                                 data=json.dumps(self.__request_payload))
         locations = []
-        pprint(response.text)
+        pprint(response.headers)
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
