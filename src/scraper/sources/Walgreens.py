@@ -29,7 +29,7 @@ class Walgreens(AppointmentSource):
         response = session.post(url=self.scrape_url,
                                 json=self.__request_payload)
         locations = []
-        print(curlify.to_curl(response.request, compressed=True))
+        print(curlify.to_curl(response.request))
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
@@ -46,6 +46,7 @@ class Walgreens(AppointmentSource):
             'authority': 'www.walgreens.com',
             'dnt': '1',
             'accept-language': 'en-US,en;q=0.9',
+            'accept-Encoding': 'gzip, deflate, br',
             'origin': 'https://www.walgreens.com',
             'accept': 'application/json, text/plain, */*',
             'content-type': 'application/json; charset=UTF-8',
