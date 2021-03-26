@@ -32,7 +32,7 @@ class Walgreens(AppointmentSource):
         #                         json=self.__request_payload)
         locations = []
         headers = {
-            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'
+            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
         }
 
         req = request.Request("https://www.walgreens.com/topic/v1/csrf", headers=headers)
@@ -48,6 +48,7 @@ class Walgreens(AppointmentSource):
                 'accept-language': 'en-US,en;q=0.9',
                 'accept-encoding': 'gzip, deflate, br',
                 'Content-Type': 'application/json; charset=UTF-8',
+                'Connection': 'Keep-Alive'
             })
         data = json.dumps(self.__request_payload).encode('utf8')
         headers.update({'Content-Length': len(data)})
