@@ -2,11 +2,14 @@ import gzip
 import json
 import logging
 import time
+import urllib
 from datetime import datetime
 from pprint import pprint
 import curlify
 
 from urllib import request, parse
+
+import httplib2
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
@@ -19,7 +22,7 @@ class Walgreens(AppointmentSource):
     scrape_url = 'https://www.walgreens.com/hcschedulersvc/svc/v1/immunizationLocations/availability'
     __request_payload = {"serviceId": "99",
                          "position": {"latitude": 42.36475590000001, "longitude": -71.1032591},
-                         "appointmentAvailability": {"startDateTime": "2021-03-22"},
+                         "appointmentAvailability": {"startDateTime": "2021-03-27"},
                          "radius": 25}
     global_booking_link = 'https://www.walgreens.com/topic/promotion/covid-vaccine.jsp'
     display_properties = DisplayProperties(
@@ -33,35 +36,47 @@ class Walgreens(AppointmentSource):
         #                         json=self.__request_payload)
         locations = []
         headers = {
-            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+            "Content-Type": "application/json; charset=UTF-8"
         }
 
-        req = request.Request("https://www.walgreens.com/topic/v1/csrf", headers=headers)
-        with request.urlopen(req) as response:
-            raw_cookies = response.info().get_all("Set-Cookie")
-            cookie_string = ""
-            for cookie in raw_cookies:
-                cookie_string += cookie + "; "
-            headers.update({'cookie': cookie_string})
-            resp = json.loads(response.read())
-            headers.update({
-                resp['csrfHeaderName']: resp['csrfToken'],
-                'accept-language': 'en-US,en;q=0.9',
-                'accept-encoding': 'gzip, deflate, br',
-                'Content-Type': 'application/json; charset=UTF-8',
-                'Connection': 'Keep-Alive'
-            })
-        data = json.dumps(self.__request_payload).encode('utf8')
-        headers.update({'Content-Length': len(data)})
-        time.sleep(3)
-        appts = request.Request(self.scrape_url, data=data, headers=headers)
-        with request.urlopen(appts) as appt_response:
-            response = json.loads(gzip.decompress(appt_response.read()))
-            if response['appointmentsAvailable']:
-                locations.append(Location(self.name,
-                                          self.get_global_booking_link(),
-                                          datetime.now(),
-                                          [AvailabilityWindow(1, datetime.now())]))
+        # req = request.Request("https://www.walgreens.com/topic/v1/csrf", headers=headers)
+        h = httplib2.Http(".cache")
+        resp, content = h.request("https://www.walgreens.com/topic/v1/csrf/", "GET", headers=headers)
+        pprint(resp)
+        pprint(content)
+        headers['cookie'] = resp['set-cookie']
+        headers['X-XSRF-TOKEN'] = json.loads(content)['csrfToken']
+        response, content = h.request(self.scrape_url,
+                                      'POST',
+                                      headers=headers,
+                                      body=json.dumps(self.__request_payload).encode("utf8"))
+
+        pprint(content)
+        # with request.urlopen(req) as response:
+        #     raw_cookies = response.info().get_all("Set-Cookie")
+        #     cookie_string = ""
+        #     for cookie in raw_cookies:
+        #         cookie_string += cookie + "; "
+        #     headers.update({'cookie': cookie_string})
+        #     resp = json.loads(response.read())
+        #     headers.update({
+        #         resp['csrfHeaderName']: resp['csrfToken'],
+        #         'accept-language': 'en-US,en;q=0.9',
+        #         'accept-encoding': 'gzip, deflate, br',
+        #         'Content-Type': 'application/json; charset=UTF-8',
+        #         'Connection': 'Keep-Alive'
+        #     })
+        # data = json.dumps(self.__request_payload).encode('utf8')
+        # headers.update({'Content-Length': len(data)})
+        # appts = request.Request(self.scrape_url, data=data, headers=headers)
+        # with request.urlopen(appts) as appt_response:
+        #     response = json.loads(gzip.decompress(appt_response.read()))
+        #     if response['appointmentsAvailable']:
+        #         locations.append(Location(self.name,
+        #                                   self.get_global_booking_link(),
+        #                                   datetime.now(),
+        #                                   [AvailabilityWindow(1, datetime.now())]))
         self.locations = locations
 
     # def __get_session(self):
