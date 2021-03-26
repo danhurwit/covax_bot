@@ -37,7 +37,10 @@ class Walgreens(AppointmentSource):
         locations = []
         headers = {
             "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-            "Content-Type": "application/json; charset=UTF-8"
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "en-US,en;q=0.8",
+            'Accept': 'application/json'
         }
 
         # req = request.Request("https://www.walgreens.com/topic/v1/csrf", headers=headers)
