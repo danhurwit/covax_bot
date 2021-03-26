@@ -43,8 +43,6 @@ class Walgreens(AppointmentSource):
         # req = request.Request("https://www.walgreens.com/topic/v1/csrf", headers=headers)
         h = httplib2.Http(".cache")
         resp, content = h.request("https://www.walgreens.com/topic/v1/csrf/", "GET", headers=headers)
-        pprint(resp)
-        pprint(content)
         headers['cookie'] = resp['set-cookie']
         headers['X-XSRF-TOKEN'] = json.loads(content)['csrfToken']
         response, content = h.request(self.scrape_url,
@@ -52,6 +50,7 @@ class Walgreens(AppointmentSource):
                                       headers=headers,
                                       body=json.dumps(self.__request_payload).encode("utf8"))
 
+        pprint(response)
         pprint(content)
         # with request.urlopen(req) as response:
         #     raw_cookies = response.info().get_all("Set-Cookie")
