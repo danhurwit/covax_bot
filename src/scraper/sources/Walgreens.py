@@ -27,7 +27,7 @@ class Walgreens(AppointmentSource):
         logging.basicConfig(level=logging.DEBUG)
         session = self.__get_session()
         response = session.post(url=self.scrape_url,
-                                json=self.__request_payload, verify=True)
+                                json=self.__request_payload, verify=False)
         locations = []
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
