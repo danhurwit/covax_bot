@@ -1,6 +1,7 @@
 import gzip
 import json
 import logging
+import time
 from datetime import datetime
 from pprint import pprint
 import curlify
@@ -52,7 +53,7 @@ class Walgreens(AppointmentSource):
             })
         data = json.dumps(self.__request_payload).encode('utf8')
         headers.update({'Content-Length': len(data)})
-
+        time.sleep(3)
         appts = request.Request(self.scrape_url, data=data, headers=headers)
         with request.urlopen(appts) as appt_response:
             response = json.loads(gzip.decompress(appt_response.read()))
