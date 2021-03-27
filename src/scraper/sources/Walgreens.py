@@ -63,4 +63,4 @@ class Walgreens(AppointmentSource):
                 num_pools=connections,
                 maxsize=maxsize,
                 block=block,
-                ssl_version=ssl.PROTOCOL_SSLv3)
+                ssl_version=ssl.PROTOCOL_SSLv23)
