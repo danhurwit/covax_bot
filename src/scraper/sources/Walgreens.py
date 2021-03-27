@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 from pprint import pprint
 
+import curlify
 from requests import Session
 
 from models.sources.AppointmentSource import AppointmentSource
@@ -29,7 +30,7 @@ class Walgreens(AppointmentSource):
         response = session.post(url=self.scrape_url,
                                 data=json.dumps(self.__request_payload))
         locations = []
-        pprint(response.headers)
+        print(curlify.to_curl(response.request, compressed=True))
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
