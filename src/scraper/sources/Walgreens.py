@@ -1,15 +1,13 @@
-import json
-import logging
-import ssl
+import random
+import time
 from datetime import datetime
-from http.client import HTTPConnection
-from pprint import pprint
 
-import curlify
-import requests
-from requests import Session
-from requests.adapters import HTTPAdapter
-from urllib3.poolmanager import PoolManager
+from decouple import config
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
@@ -19,41 +17,30 @@ from models.sources.Location import Location
 
 class Walgreens(AppointmentSource):
     name = "Walgreens"
-    scrape_url = 'https://www.walgreens.com/hcschedulersvc/svc/v1/immunizationLocations/availability'
-    __request_payload = {"serviceId": "99",
-                         "position": {"latitude": 42.36475590000001, "longitude": -71.1032591},
-                         "appointmentAvailability": {"startDateTime": "2021-03-27"},
-                         "radius": 25}
+    scrape_url = 'https://www.walgreens.com/findcare/vaccination/covid-19?ban=covid_vaccine_landing_schedule'
     global_booking_link = 'https://www.walgreens.com/topic/promotion/covid-vaccine.jsp'
     display_properties = DisplayProperties(
         "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Walgreens_Logo.svg/2560px-Walgreens_Logo.svg.png",
         "3CB371")
 
     def scrape_locations(self):
-        HTTPConnection.debuglevel = 1
-        session = self.__get_session()
-        response = session.post(url=self.scrape_url,
-                                data=json.dumps(self.__request_payload),
-                                allow_redirects=False)
         locations = []
-        if response.json()['appointmentsAvailable']:
+        chrome_options = Options()
+        chrome_options.headless = True
+        driver = webdriver.Chrome(executable_path=config('DRIVER_PATH'), options=chrome_options)
+        driver.get(self.scrape_url)
+        time.sleep(random.randint(1, 3))
+        driver.find_element_by_link_text("Schedule new appointment").click()
+        button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,
+            "#wag-body-main-container > section > section > section > section > section.LocationSearch_container.mt25 > div > span > button")))
+        time.sleep(random.randint(1, 5))
+        button.click()
+        alert_text = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,
+            "#wag-body-main-container > section > section > section > section > div > a > span:nth-child(2) > p"))).text
+
+        if alert_text != "Appointments unavailable":
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
                                       datetime.now(),
                                       [AvailabilityWindow(1, datetime.now())]))
         self.locations = locations
-
-    def __get_session(self):
-        s = Session()
-        s.headers.update({"User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
-        csrf_response = s.get('https://www.walgreens.com/topic/v1/csrf')
-        s.headers.update({
-            'X-XSRF-TOKEN': csrf_response.json()['csrfToken'],
-            'authority': 'www.walgreens.com',
-            'accept-language': 'en-US,en;q=0.9',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept': 'application/json, text/plain, */*',
-            'content-type': 'application/json; charset=UTF-8',
-            'Connection': 'keep-alive'
-        })
-        return s
