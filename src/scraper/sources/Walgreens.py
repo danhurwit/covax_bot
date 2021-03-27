@@ -1,15 +1,8 @@
-import gzip
 import json
 import logging
-import time
-import urllib
 from datetime import datetime
 from pprint import pprint
-import curlify
 
-from urllib import request, parse
-
-import httplib2
 from requests import Session
 
 from models.sources.AppointmentSource import AppointmentSource
@@ -36,7 +29,6 @@ class Walgreens(AppointmentSource):
         response = session.post(url=self.scrape_url,
                                 data=json.dumps(self.__request_payload))
         locations = []
-        pprint(response.headers)
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
