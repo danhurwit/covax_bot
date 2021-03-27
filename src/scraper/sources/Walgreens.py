@@ -31,7 +31,8 @@ class Walgreens(AppointmentSource):
         logging.basicConfig(level=logging.DEBUG)
         session = self.__get_session()
         response = session.post(url=self.scrape_url,
-                                data=json.dumps(self.__request_payload))
+                                data=json.dumps(self.__request_payload),
+                                allow_redirects=False)
         locations = []
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
@@ -43,7 +44,6 @@ class Walgreens(AppointmentSource):
     def __get_session(self):
         s = Session()
         s.headers.update({"User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
-        s.mount("https://www.walgreens.com", self.Ssl3HttpAdapter())
         csrf_response = s.get('https://www.walgreens.com/topic/v1/csrf')
         s.headers.update({
             'X-XSRF-TOKEN': csrf_response.json()['csrfToken'],
@@ -54,13 +54,3 @@ class Walgreens(AppointmentSource):
             'content-type': 'application/json; charset=UTF-8',
         })
         return s
-
-    class Ssl3HttpAdapter(HTTPAdapter):
-        """"Transport adapter" that allows us to use SSLv3."""
-
-        def init_poolmanager(self, connections, maxsize, block=False, **kwargs):
-            self.poolmanager = PoolManager(
-                num_pools=connections,
-                maxsize=maxsize,
-                block=block,
-                ssl_version=ssl.PROTOCOL_SSLv23)
