@@ -30,7 +30,7 @@ class Walgreens(AppointmentSource):
         chrome_options.headless = True
         driver = webdriver.Chrome(executable_path=config('DRIVER_PATH'), options=chrome_options)
         driver.get(self.scrape_url)
-        time.sleep(random.randint(1, 3))
+        time.sleep(random.randint(1, 5))
         driver.find_element_by_link_text("Schedule new appointment").click()
         try:
             button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,
