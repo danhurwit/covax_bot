@@ -35,7 +35,6 @@ class Walgreens(AppointmentSource):
         try:
             button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,
                 "#wag-body-main-container > section > section > section > section > section.LocationSearch_container.mt25 > div > span > button")))
-            logger.log("page_source\n" + driver.page_source)
             time.sleep(random.randint(1, 5))
 
             button.click()
@@ -49,4 +48,4 @@ class Walgreens(AppointmentSource):
                                           [AvailabilityWindow(1, datetime.now())]))
             self.locations = locations
         except:
-            logger.log("page source on error\n")
+            logger.log("page source on error\n" + driver.page_source)
