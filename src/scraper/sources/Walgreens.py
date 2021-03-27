@@ -52,5 +52,6 @@ class Walgreens(AppointmentSource):
             'accept-encoding': 'gzip, deflate, br',
             'accept': 'application/json, text/plain, */*',
             'content-type': 'application/json; charset=UTF-8',
+            'Connection': 'keep-alive'
         })
         return s
