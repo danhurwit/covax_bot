@@ -1,10 +1,13 @@
 import json
 import logging
+import ssl
 from datetime import datetime
 from pprint import pprint
 
 import curlify
 from requests import Session
+from requests.adapters import HTTPAdapter
+from urllib3.poolmanager import PoolManager
 
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.AvailabilityWindow import AvailabilityWindow
@@ -41,6 +44,7 @@ class Walgreens(AppointmentSource):
     def __get_session(self):
         s = Session()
         s.headers.update({"User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'})
+        s.mount("https://www.walgreens.com", self.Ssl3HttpAdapter())
         csrf_response = s.get('https://www.walgreens.com/topic/v1/csrf')
         s.headers.update({
             'X-XSRF-TOKEN': csrf_response.json()['csrfToken'],
@@ -51,3 +55,13 @@ class Walgreens(AppointmentSource):
             'content-type': 'application/json; charset=UTF-8',
         })
         return s
+
+    class Ssl3HttpAdapter(HTTPAdapter):
+        """"Transport adapter" that allows us to use SSLv3."""
+
+        def init_poolmanager(self, connections, maxsize, block=False, **kwargs):
+            self.poolmanager = PoolManager(
+                num_pools=connections,
+                maxsize=maxsize,
+                block=block,
+                ssl_version=ssl.PROTOCOL_SSLv23)
