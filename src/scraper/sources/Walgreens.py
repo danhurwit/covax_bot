@@ -46,6 +46,8 @@ class Walgreens(AppointmentSource):
                                           self.get_global_booking_link(),
                                           datetime.now(),
                                           [AvailabilityWindow(1, datetime.now())]))
+            driver.close()
             self.locations = locations
         except:
+            driver.close()
             logger.log("page source on error\n" + driver.page_source)
