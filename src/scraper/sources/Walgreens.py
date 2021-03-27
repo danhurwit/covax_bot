@@ -49,4 +49,4 @@ class Walgreens(AppointmentSource):
                                           [AvailabilityWindow(1, datetime.now())]))
             self.locations = locations
         except:
-            logger.log("page source on error\n" + driver.page_source)
+            logger.log("page source on error\n")
