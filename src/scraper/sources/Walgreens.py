@@ -29,6 +29,7 @@ class Walgreens(AppointmentSource):
         response = session.post(url=self.scrape_url,
                                 data=json.dumps(self.__request_payload))
         locations = []
+        pprint(response.headers)
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
@@ -43,15 +44,9 @@ class Walgreens(AppointmentSource):
         s.headers.update({
             'X-XSRF-TOKEN': csrf_response.json()['csrfToken'],
             'authority': 'www.walgreens.com',
-            'dnt': '1',
             'accept-language': 'en-US,en;q=0.9',
             'accept-encoding': 'gzip, deflate, br',
-            'origin': 'https://www.walgreens.com',
             'accept': 'application/json, text/plain, */*',
             'content-type': 'application/json; charset=UTF-8',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-dest': 'empty',
-            'referer': 'https://www.walgreens.com/findcare/vaccination/covid-19/location-screening'
         })
         return s
