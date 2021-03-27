@@ -33,7 +33,6 @@ class Walgreens(AppointmentSource):
         response = session.post(url=self.scrape_url,
                                 data=json.dumps(self.__request_payload))
         locations = []
-        print(curlify.to_curl(response.request, compressed=True))
         if response.json()['appointmentsAvailable']:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
@@ -64,4 +63,4 @@ class Walgreens(AppointmentSource):
                 num_pools=connections,
                 maxsize=maxsize,
                 block=block,
-                ssl_version=ssl.PROTOCOL_SSLv23)
+                ssl_version=ssl.PROTOCOL_SSLv3)
