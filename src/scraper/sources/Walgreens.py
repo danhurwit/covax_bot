@@ -50,8 +50,8 @@ class Walgreens(AppointmentSource):
                                           datetime.now(),
                                           [AvailabilityWindow(1, datetime.now())]))
             self.locations = locations
-        except:
-            logger.log("page source on error\n" + driver.page_source)
+        except Exception as e:
+            logger.log("Walgreens scrape error\n {}".format(e))
 
         finally:
             driver.close()
