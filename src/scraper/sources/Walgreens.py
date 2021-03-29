@@ -33,21 +33,27 @@ class Walgreens(AppointmentSource):
         time.sleep(random.randint(1, 5))
         driver.find_element_by_link_text("Schedule new appointment").click()
         try:
-            button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,
-                "#wag-body-main-container > section > section > section > section > section.LocationSearch_container.mt25 > div > span > button")))
+            button = WebDriverWait(driver, 10) \
+                .until(EC.element_to_be_clickable((By.CSS_SELECTOR,
+                                                   "#wag-body-main-container > section "
+                                                   "> section > section > section > "
+                                                   "section.LocationSearch_container.mt25 > div > span > button")))
             time.sleep(random.randint(1, 5))
 
             button.click()
-            alert_text = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,
-                "#wag-body-main-container > section > section > section > section > div > a > span:nth-child(2) > p"))).text
+            alert_text = WebDriverWait(driver, 10) \
+                .until(EC.visibility_of_element_located((By.CSS_SELECTOR,
+                                                         "#wag-body-main-container > section > section > section > "
+                                                         "section > div > a > span:nth-child(2) > p"))).text
 
             if alert_text != "Appointments unavailable":
                 locations.append(Location(self.name,
                                           self.get_global_booking_link(),
                                           datetime.now(),
                                           [AvailabilityWindow(1, datetime.now())]))
-            driver.close()
             self.locations = locations
         except:
-            driver.close()
             logger.log("page source on error\n" + driver.page_source)
+
+        finally:
+            driver.close()
