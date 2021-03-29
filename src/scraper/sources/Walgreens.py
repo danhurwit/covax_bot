@@ -26,7 +26,7 @@ class Walgreens(AppointmentSource):
 
     def scrape_locations(self):
         chrome_options = Options()
-        chrome_options.headless = False # detected in headless mode
+        chrome_options.headless = True # detected in headless mode
         driver = webdriver.Chrome(executable_path=config('DRIVER_PATH'), options=chrome_options)
         try:
             driver.get(self.scrape_url)
