@@ -25,27 +25,25 @@ class Walgreens(AppointmentSource):
         "3CB371")
 
     def scrape_locations(self):
-        locations = []
         chrome_options = Options()
         chrome_options.headless = True
         driver = webdriver.Chrome(executable_path=config('DRIVER_PATH'), options=chrome_options)
-        driver.get(self.scrape_url)
-        time.sleep(random.randint(1, 5))
-        driver.find_element_by_link_text("Schedule new appointment").click()
         try:
+            driver.get(self.scrape_url)
+            time.sleep(random.randint(1, 5))
+            driver.find_element_by_link_text("Schedule new appointment").click()
             button = WebDriverWait(driver, 10) \
                 .until(EC.element_to_be_clickable((By.CSS_SELECTOR,
                                                    "#wag-body-main-container > section "
                                                    "> section > section > section > "
                                                    "section.LocationSearch_container.mt25 > div > span > button")))
             time.sleep(random.randint(1, 5))
-
             button.click()
             alert_text = WebDriverWait(driver, 10) \
                 .until(EC.visibility_of_element_located((By.CSS_SELECTOR,
                                                          "#wag-body-main-container > section > section > section > "
                                                          "section > div > a > span:nth-child(2) > p"))).text
-
+            locations = []
             if alert_text != "Appointments unavailable":
                 locations.append(Location(self.name,
                                           self.get_global_booking_link(),
