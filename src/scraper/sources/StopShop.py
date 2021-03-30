@@ -27,7 +27,7 @@ class StopShop(AppointmentSource):
             payload = self.__payload.copy()
             payload['zip'] = zip_code
             response = session.post(self.scrape_url, data=payload)
-            if "There are no locations with available appointments" not in response.text and response.text != "":
+            if "There are no locations with available appointments" not in response.text and response.text != '""':
                 pprint(self.__payload)
                 pprint(response.text)
                 availability = True
