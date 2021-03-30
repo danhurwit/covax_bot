@@ -23,7 +23,7 @@ class Hannafords(AppointmentSource):
         session = self.__get_session()
         response = session.post(self.scrape_url, data=self.__payload)
         locations = []
-        if "There are no locations with available appointments" in response.text:
+        if "There are no locations with available appointments" not in response.text:
             locations.append(Location(self.name,
                                       self.get_global_booking_link(),
                                       datetime.now(),
