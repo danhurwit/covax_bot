@@ -35,7 +35,7 @@ class Hannafords(AppointmentSource):
         s.headers.update({
             "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
         })
-        s.get("https://hannafordsched.rxtouch.com/rbssched/program/covid19/Patient/Advisory")
+        s.get("https://hannafordsched.rxtouch.com/rbssched/program/covid19/Patient/CheckZipCode")
         r = s.get(
             "https://reportsonline.queue-it.net/?c=reportsonline&e=hannafordcovid19&ver=v3-aspnet-3.6.2&cver=52&man=Hannaford")
         token = s.cookies.get("Queue-it-token-v3")
