@@ -31,7 +31,7 @@ class Walgreens(AppointmentSource):
         driver = webdriver.Chrome(executable_path=config('DRIVER_PATH'), options=chrome_options)
         access_denied = self.navigate_to_availability_page(driver)
         if access_denied:
-            print("discovered... rats")
+            logger.log("walgreens access denied")
             self.should_update_availability = False
             self.locations = []
             driver.close()
