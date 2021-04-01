@@ -4,6 +4,7 @@ from datetime import datetime
 
 from decouple import config
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -28,8 +29,14 @@ class Walgreens(AppointmentSource):
         chrome_options = Options()
         chrome_options.headless = True  # detected in headless mode
         driver = webdriver.Chrome(executable_path=config('DRIVER_PATH'), options=chrome_options)
+        access_denied = self.navigate_to_availability_page(driver)
+        if access_denied:
+            print("discovered... rats")
+            self.should_update_availability = False
+            self.locations = []
+            driver.close()
+            return
         try:
-            self.nav_to_location_screening(driver)
             search_button = self.wait_for_search_button(driver)
             self.random_sleep(2000, 5000, 500)
             self.enter_zip_code(driver)
@@ -44,6 +51,15 @@ class Walgreens(AppointmentSource):
             logger.log("Walgreens scrape error\n {}".format(driver.page_source[:1000]))
         finally:
             driver.close()
+
+    def navigate_to_availability_page(self, driver):
+        access_denied = False
+        try:
+            self.nav_to_location_screening(driver)
+            access_denied = WebDriverWait(driver, 2).until(EC.title_is('Access Denied'))
+        except TimeoutException as e:
+            pass
+        return access_denied
 
     def wait_for_search_button(self, driver):
         button = WebDriverWait(driver, 10) \

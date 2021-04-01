@@ -13,7 +13,8 @@ def run():
         locations_to_publish = get_locations_to_publish(source)
         if locations_to_publish:
             publisher.publish_locations(source, locations_to_publish)
-        update_availability_counts(source)
+        if source.should_update_availability:
+            update_availability_counts(source)
         print("Found new availability at: {} / {} {} sites..."
               .format(len(locations_to_publish), len(source.get_locations()), source.get_name()))
 

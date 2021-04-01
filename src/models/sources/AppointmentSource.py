@@ -8,6 +8,7 @@ class AppointmentSource:
     locations: List[Location] = []
     has_time_availability: bool = False
     has_location_booking_links: bool = False
+    should_update_availability: bool = True
     global_booking_link = ""
     display_properties = None
     scrape_url = ""
