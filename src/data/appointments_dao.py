@@ -30,7 +30,7 @@ def get_site_availability(source: str, site_name: str, availability_date: dateti
     query = 'SELECT num_available FROM appointments ' \
             'WHERE source = ? AND site_name = ? AND availability_date = ?'
     result = execute_single_result(DB_URL, query, (source, site_name, availability_date))
-    return int(result[0]) if result else 0
+    return int(result['num_available']) if result else 0
 
 
 def __get_formatted_availability(availability_date) -> str:
