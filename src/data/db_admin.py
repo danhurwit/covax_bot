@@ -16,7 +16,22 @@ def create_appointments_table():
     con.close()
 
 
-def create_indexes():
+def create_session_table():
+    con = sqlite3.connect(DB_NAME)
+    cur = con.cursor()
+    cur.execute('''CREATE TABLE sessions(
+                            source text NOT NULL, 
+                            id text NOT NULL,
+                            created_at real NOT NULL,
+                            updated_at real NOT NULL,
+                            queue_status text, 
+                            cookies text, 
+                            PRIMARY KEY(source, created_at))''')
+    con.commit()
+    con.close()
+
+
+def create_appointments_indices():
     con = sqlite3.connect(DB_NAME)
     cur = con.cursor()
     cur.execute('''create index appointments_num_available_index on appointments (num_available)''')
@@ -24,6 +39,29 @@ def create_indexes():
     con.close()
 
 
+def create_sessions_indices():
+    con = sqlite3.connect(DB_NAME)
+    cur = con.cursor()
+    cur.execute('''create index sessions_id on sessions (id)''')
+    cur.execute('''create index sessions_created_at on sessions (created_at)''')
+    con.commit()
+    con.close()
+
+
 if __name__ == "__main__":
-    create_appointments_table()
-    create_indexes()
+    try:
+        create_appointments_table()
+    except sqlite3.OperationalError as e:
+        print(e)
+    try:
+        create_session_table()
+    except sqlite3.OperationalError as e:
+        print(e)
+    try:
+        create_appointments_indices()
+    except sqlite3.OperationalError as e:
+        print(e)
+    try:
+        create_sessions_indices()
+    except sqlite3.OperationalError as e:
+        print(e)
