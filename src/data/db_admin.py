@@ -16,6 +16,18 @@ def create_appointments_table():
     con.close()
 
 
+def create_availability_records_table():
+    con = sqlite3.connect(DB_NAME)
+    cur = con.cursor()
+    cur.execute('''CREATE TABLE availability_records(
+                            source text NOT NULL,
+                            site_name text NOT NULL, 
+                            publish_datetime real NOT NULL, 
+                            PRIMARY KEY(source, site_name, publish_datetime))''')
+    con.commit()
+    con.close()
+
+
 def create_session_table():
     con = sqlite3.connect(DB_NAME)
     cur = con.cursor()
@@ -55,6 +67,10 @@ if __name__ == "__main__":
         print(e)
     try:
         create_session_table()
+    except sqlite3.OperationalError as e:
+        print(e)
+    try:
+        create_availability_records_table()
     except sqlite3.OperationalError as e:
         print(e)
     try:

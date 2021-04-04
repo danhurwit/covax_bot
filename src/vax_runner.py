@@ -1,6 +1,6 @@
 from typing import List
 
-from data import appointments_dao
+from data import appointments_dao, availability_records_dao
 from models.sources.AppointmentSource import AppointmentSource
 from models.sources.Location import Location
 from publisher import publisher
@@ -13,10 +13,16 @@ def run():
         locations_to_publish = get_locations_to_publish(source)
         if locations_to_publish:
             publisher.publish_locations(source, locations_to_publish)
+            record_availability(locations_to_publish, source)
         if source.should_update_availability:
             update_availability_counts(source)
         print("Found new availability at: {} / {} {} sites..."
               .format(len(locations_to_publish), len(source.get_locations()), source.get_name()))
+
+
+def record_availability(locations_to_publish, source):
+    for loc in locations_to_publish:
+        availability_records_dao.create_availability_record(source.get_name(), loc.get_name())
 
 
 def get_locations_to_publish(source: AppointmentSource) -> List[Location]:
